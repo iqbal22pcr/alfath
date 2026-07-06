@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GelombangPpdb extends Model
@@ -30,5 +31,10 @@ class GelombangPpdb extends Model
     public function pendaftaranPpdb(): HasMany
     {
         return $this->hasMany(PendaftaranPpdb::class);
+    }
+
+    public function tahunAjaran(): BelongsTo
+    {
+        return $this->belongsTo(TahunAjaran::class);
     }
 }

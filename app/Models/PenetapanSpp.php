@@ -25,4 +25,9 @@ class PenetapanSpp extends Model
     {
         return $this->belongsTo(KategoriSiswa::class);
     }
+
+    public function tahunAjaran(): BelongsTo
+    {
+        return $this->belongsTo(TahunAjaran::class);
+    }
 }
