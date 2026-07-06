@@ -46,4 +46,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            if (empty($user->role)) {
+                throw new \RuntimeException('User harus dibuat dengan role eksplisit — tidak boleh kosong.');
+            }
+        });
+    }
 }

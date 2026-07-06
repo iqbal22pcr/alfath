@@ -29,5 +29,7 @@ class DatabaseSeeder extends Seeder
                 'role' => $role,
             ]);
         }
+
+        $this->call(KategoriSiswaSeeder::class);
     }
 }

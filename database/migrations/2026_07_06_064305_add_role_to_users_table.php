@@ -19,7 +19,7 @@ return new class extends Migration
                 'staf_keuangan',
                 'staf_ppdb',
                 'wali_murid',
-            ])->default('wali_murid')->after('email');
+            ])->after('email');
         });
     }
 
