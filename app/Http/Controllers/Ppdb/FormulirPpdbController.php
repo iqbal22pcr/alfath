@@ -91,6 +91,8 @@ class FormulirPpdbController extends Controller
 
     /**
      * Halaman status sederhana: data yang sudah disubmit + status verifikasi.
+     * Kalau sudah diterima, sertakan juga status siswa & tagihan (read-only —
+     * pencatatan pembayaran tetap wewenang staf_keuangan, bukan di sini).
      */
     public function status(Request $request): RedirectResponse|Response
     {
@@ -100,6 +102,35 @@ class FormulirPpdbController extends Controller
 
         if (! $pendaftaran) {
             return redirect()->route('ppdb.formulir.create');
+        }
+
+        $siswaData = null;
+
+        if ($pendaftaran->status === 'diterima') {
+            $siswa = $pendaftaran->siswa()->with('tagihan.pembayaran')->first();
+
+            if ($siswa) {
+                $siswaData = [
+                    'status' => $siswa->status,
+                    'tagihan' => $siswa->tagihan->map(function ($t) {
+                        $totalDibayar = $t->pembayaran->sum('nominal_dibayar');
+
+                        return [
+                            'id' => $t->id,
+                            'jenis_biaya' => $t->jenis_biaya,
+                            'nominal' => (float) $t->nominal,
+                            'total_dibayar' => (float) $totalDibayar,
+                            'sisa' => (float) $t->nominal - $totalDibayar,
+                            'pembayaran' => $t->pembayaran->map(fn ($p) => [
+                                'id' => $p->id,
+                                'tanggal_bayar' => $p->tanggal_bayar->format('d/m/Y'),
+                                'nominal_dibayar' => (float) $p->nominal_dibayar,
+                                'metode' => $p->metode,
+                            ]),
+                        ];
+                    }),
+                ];
+            }
         }
 
         return Inertia::render('ppdb/status', [
@@ -113,6 +144,7 @@ class FormulirPpdbController extends Controller
                 'gelombang' => 'Gelombang '.$pendaftaran->gelombangPpdb->nomor_gelombang.' — '.$pendaftaran->gelombangPpdb->tahun_ajaran_id,
                 'dokumen' => $pendaftaran->dokumenPpdb->pluck('jenis_dokumen'),
             ],
+            'siswa' => $siswaData,
         ]);
     }
 

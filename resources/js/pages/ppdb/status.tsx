@@ -21,6 +21,45 @@ const badgeVariantByStatus = {
     ditolak: 'destructive',
 } as const;
 
+const badgeVariantBySiswaStatus = {
+    calon: 'accent',
+    aktif: 'success',
+} as const;
+
+type JenisBiaya = 'spp' | 'uang_masuk_pembangunan' | 'seragam' | 'buku';
+
+const labelJenisBiaya: Record<JenisBiaya, string> = {
+    spp: 'SPP',
+    uang_masuk_pembangunan: 'Uang Masuk/Pembangunan',
+    seragam: 'Seragam',
+    buku: 'Buku',
+};
+
+function formatRupiah(value: number): string {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
+}
+
+interface Pembayaran {
+    id: number;
+    tanggal_bayar: string;
+    nominal_dibayar: number;
+    metode: 'tunai' | 'transfer';
+}
+
+interface TagihanItem {
+    id: number;
+    jenis_biaya: JenisBiaya;
+    nominal: number;
+    total_dibayar: number;
+    sisa: number;
+    pembayaran: Pembayaran[];
+}
+
+interface SiswaData {
+    status: 'calon' | 'aktif';
+    tagihan: TagihanItem[];
+}
+
 interface StatusProps {
     pendaftaran: {
         id: number;
@@ -32,9 +71,10 @@ interface StatusProps {
         gelombang: string;
         dokumen: string[];
     };
+    siswa: SiswaData | null;
 }
 
-export default function Status({ pendaftaran }: StatusProps) {
+export default function Status({ pendaftaran, siswa }: StatusProps) {
     const { flash } = usePage<SharedData>().props;
 
     return (
@@ -81,6 +121,55 @@ export default function Status({ pendaftaran }: StatusProps) {
                         </div>
                     </CardContent>
                 </Card>
+
+                {siswa && (
+                    <Card className="max-w-2xl">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                Data Siswa
+                                <Badge variant={badgeVariantBySiswaStatus[siswa.status]}>{siswa.status}</Badge>
+                            </CardTitle>
+                            <CardDescription>Tagihan &amp; riwayat pembayaran (hanya lihat — pencatatan pembayaran dilakukan oleh staf keuangan).</CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex flex-col gap-4">
+                            {siswa.tagihan.map((t) => (
+                                <div key={t.id} className="rounded-lg border border-border p-4">
+                                    <div className="mb-2 flex items-center justify-between">
+                                        <span className="font-medium">{labelJenisBiaya[t.jenis_biaya]}</span>
+                                        {t.sisa <= 0 ? <Badge variant="success">Lunas</Badge> : <Badge variant="secondary">Belum Lunas</Badge>}
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">
+                                        Nominal: {formatRupiah(t.nominal)} &middot; Sudah dibayar: {formatRupiah(t.total_dibayar)} &middot; Sisa:{' '}
+                                        {formatRupiah(t.sisa)}
+                                    </p>
+
+                                    {t.pembayaran.length > 0 && (
+                                        <div className="mt-3 overflow-hidden rounded-md border border-border">
+                                            <table className="w-full text-sm">
+                                                <thead className="bg-muted text-muted-foreground">
+                                                    <tr>
+                                                        <th className="px-3 py-2 text-left font-medium">Tanggal Bayar</th>
+                                                        <th className="px-3 py-2 text-left font-medium">Nominal</th>
+                                                        <th className="px-3 py-2 text-left font-medium">Metode</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-border">
+                                                    {t.pembayaran.map((p) => (
+                                                        <tr key={p.id}>
+                                                            <td className="px-3 py-2">{p.tanggal_bayar}</td>
+                                                            <td className="px-3 py-2">{formatRupiah(p.nominal_dibayar)}</td>
+                                                            <td className="px-3 py-2 capitalize">{p.metode}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </CardContent>
+                    </Card>
+                )}
             </div>
         </AppLayout>
     );
