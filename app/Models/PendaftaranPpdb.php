@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PendaftaranPpdb extends Model
 {
@@ -46,5 +47,10 @@ class PendaftaranPpdb extends Model
     public function dokumenPpdb(): HasMany
     {
         return $this->hasMany(DokumenPpdb::class);
+    }
+
+    public function siswa(): HasOne
+    {
+        return $this->hasOne(Siswa::class);
     }
 }

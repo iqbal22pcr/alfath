@@ -23,4 +23,9 @@ class KategoriSiswa extends Model
     {
         return $this->hasMany(PendaftaranPpdb::class);
     }
+
+    public function penetapanSpp(): HasMany
+    {
+        return $this->hasMany(PenetapanSpp::class);
+    }
 }
