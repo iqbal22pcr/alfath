@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, ClipboardCheck, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Folder, LayoutGrid, Wallet } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const footerNavItems: NavItem[] = [
@@ -23,8 +23,8 @@ const footerNavItems: NavItem[] = [
 export function AppSidebar() {
     const { auth } = usePage<SharedData>().props;
 
-    // Role lain (admin, kepala_sekolah, guru, staf_keuangan, wali_murid)
-    // belum punya modul sendiri — sidebar mereka tetap dashboard generik.
+    // Role lain (admin, kepala_sekolah, guru, wali_murid) belum punya modul
+    // sendiri — sidebar mereka tetap dashboard generik.
     const mainNavItems: NavItem[] = [
         {
             title: 'Dashboard',
@@ -38,6 +38,14 @@ export function AppSidebar() {
             title: 'Verifikasi Pendaftaran',
             url: '/ppdb/pendaftaran',
             icon: ClipboardCheck,
+        });
+    }
+
+    if (auth.user.role === 'staf_keuangan') {
+        mainNavItems.push({
+            title: 'Pembayaran Siswa',
+            url: '/keuangan/siswa',
+            icon: Wallet,
         });
     }
 
