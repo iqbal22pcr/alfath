@@ -9,12 +9,17 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+                // bg-primary-foreground-safe (not bg-primary): raw --primary
+                // only reaches ~3.43:1 contrast against white text, below
+                // WCAG AA 4.5:1 for normal-size text like this button's label.
+                default: 'bg-primary-foreground-safe text-primary-foreground hover:bg-primary-foreground-safe/90',
                 destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
                 outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
                 secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
                 ghost: 'hover:bg-accent hover:text-accent-foreground',
-                link: 'text-primary underline-offset-4 hover:underline',
+                // Same reasoning as `default`: this renders as colored text on
+                // a light background, same contrast math applies either way.
+                link: 'text-primary-foreground-safe underline-offset-4 hover:underline',
             },
             size: {
                 default: 'h-10 px-4 py-2',

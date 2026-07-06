@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { BookOpen, GraduationCap, HeartHandshake, Mail, MapPin, Phone, Sparkles } from 'lucide-react';
+import { BookOpen, HeartHandshake, Mail, MapPin, Phone, Sparkles } from 'lucide-react';
 
 const keunggulan = [
     {
@@ -33,7 +33,7 @@ export default function Welcome() {
                 <header className="border-b">
                     <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
                         <div className="flex items-center gap-2 font-semibold">
-                            <GraduationCap className="size-6" />
+                            <img src="/images/logo-alfath.jpg" alt="Logo SDIT Al-Fath" className="size-8 rounded-md object-cover" />
                             <span>SDIT Al-Fath Pekanbaru</span>
                         </div>
                         <nav className="flex items-center gap-3">

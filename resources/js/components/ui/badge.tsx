@@ -8,9 +8,16 @@ const badgeVariants = cva(
     {
         variants: {
             variant: {
-                default: 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80',
+                // bg-primary-foreground-safe (not bg-primary): same contrast
+                // reasoning as Button's default variant — badge text is
+                // text-xs, normal-size text, needs 4.5:1.
+                default: 'border-transparent bg-primary-foreground-safe text-primary-foreground hover:bg-primary-foreground-safe/80',
                 secondary: 'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
                 destructive: 'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
+                // Status "calon" (non-kritis).
+                accent: 'border-transparent bg-accent text-accent-foreground hover:bg-accent/80',
+                // Status "aktif" / "lunas".
+                success: 'border-transparent bg-success text-success-foreground hover:bg-success/80',
                 outline: 'text-foreground',
             },
         },
