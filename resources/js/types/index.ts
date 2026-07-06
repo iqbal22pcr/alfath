@@ -21,17 +21,32 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export interface Flash {
+    success?: string;
+    kuotaAlert?: {
+        kategori: string;
+        kuota: number | null;
+        aktif: number;
+        calon: number;
+    };
+}
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    flash: Flash;
+    errors: Record<string, string>;
     [key: string]: unknown;
 }
+
+export type Role = 'admin' | 'kepala_sekolah' | 'guru' | 'staf_keuangan' | 'staf_ppdb' | 'wali_murid';
 
 export interface User {
     id: number;
     name: string;
     email: string;
+    role: Role;
     avatar?: string;
     email_verified_at: string | null;
     created_at: string;

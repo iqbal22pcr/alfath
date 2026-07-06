@@ -13,9 +13,51 @@ use App\Models\Tagihan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class PendaftaranPpdbController extends Controller
 {
+    /**
+     * Daftar pendaftaran PPDB yang belum diproses (status masih diajukan).
+     */
+    public function index(): Response
+    {
+        $pendaftaran = PendaftaranPpdb::with('gelombangPpdb')
+            ->where('status', 'diajukan')
+            ->latest()
+            ->get()
+            ->map(fn (PendaftaranPpdb $p) => [
+                'id' => $p->id,
+                'gelombang' => 'Gelombang '.$p->gelombangPpdb->nomor_gelombang.' — '.$p->gelombangPpdb->tahun_ajaran_id,
+                'tanggal_daftar' => $p->created_at->format('d/m/Y'),
+            ]);
+
+        return Inertia::render('ppdb/index', [
+            'pendaftaran' => $pendaftaran,
+        ]);
+    }
+
+    /**
+     * Form verifikasi satu pendaftaran.
+     */
+    public function show(PendaftaranPpdb $pendaftaran): RedirectResponse|Response
+    {
+        if ($pendaftaran->status !== 'diajukan') {
+            return redirect()->route('ppdb.pendaftaran.index')
+                ->with('success', "Pendaftaran ini sudah diproses sebelumnya (status: {$pendaftaran->status}).");
+        }
+
+        return Inertia::render('ppdb/verifikasi', [
+            'pendaftaran' => [
+                'id' => $pendaftaran->id,
+                'gelombang' => 'Gelombang '.$pendaftaran->gelombangPpdb->nomor_gelombang.' — '.$pendaftaran->gelombangPpdb->tahun_ajaran_id,
+                'tanggal_daftar' => $pendaftaran->created_at->format('d/m/Y'),
+            ],
+            'kategoriSiswa' => KategoriSiswa::orderBy('nama')->get(['id', 'nama']),
+        ]);
+    }
+
     /**
      * Verifikasi satu pendaftaran PPDB: staf memilih kategori DAN mengubah
      * status jadi diterima/ditolak dalam satu submission (bukan dua tahap).
@@ -35,7 +77,7 @@ class PendaftaranPpdbController extends Controller
         if ($validated['status'] === 'ditolak') {
             $pendaftaran->update(['status' => 'ditolak']);
 
-            return back()->with('success', 'Pendaftaran ditolak.');
+            return redirect()->route('ppdb.pendaftaran.index')->with('success', 'Pendaftaran ditolak.');
         }
 
         $kategoriSiswa = KategoriSiswa::findOrFail($validated['kategori_siswa_id']);
@@ -105,7 +147,7 @@ class PendaftaranPpdbController extends Controller
             return $siswa;
         });
 
-        return back()->with([
+        return redirect()->route('ppdb.pendaftaran.index')->with([
             'success' => 'Pendaftaran diterima.',
             'kuotaAlert' => $this->buildKuotaAlert($kategoriSiswa, $tahunAjaranId),
         ]);
